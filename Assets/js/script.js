@@ -1,29 +1,38 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-
-
-//==========================
-// ------- ARRAYS -------
-//==========================
+// ==================== ARRAYS ====================
 let array;
+let duplicateTracker = false;
 
 
-
-
-
+// ==================== UPDATE FROM LOCAL STOAGE ====================
 // Checks if local storage already has score stored
-  if ( localStorage.getItem('task') ) {
-    const stringArray = localStorage.getItem('task');
-    array = JSON.parse(stringArray);
-  } else {
-    array = [];
+if ( localStorage.getItem('task') ) {
+  const stringArray = localStorage.getItem('task');
+  array = JSON.parse(stringArray);
+  clearEmpty();
+} else {
+  array = [];
+};
+
+// ==================== CLEARS ARRAY OF EMPTY ====================
+// Assures that no empty strings are sent to local storage
+function clearEmpty() {
+  for (let i=0; i<array.length; i++) {
+    if (array[i].textfield === "") {
+      array.splice(i, 1);
+    };
   };
+};
 
 
-$(function () {
 
-  // ==================== CLICK FUNCTION ====================
+
+
+  
+
+
+function updatePage() {
+
+  // ==================== CLICK/TO LOCAL STORAGE FUNCTION ====================
   $('.saveBtn').click(function() {
     // ====== Grab the value of the textfield that was closest to the click event
     let textfieldValue = $(this).closest('.row').find('.description').val().trim();
@@ -34,54 +43,66 @@ $(function () {
       timeBlock: timeBlockNumber,
       textfield: textfieldValue,
     }
-    // ====== Push object into array
-    array.push(task);
+    // ====== Loop through the array to check if there is any matchin timeBlock to task
+    for (let i=0; i<array.length; i++) {
+      if (array[i].timeBlock === task.timeBlock) {
+    // ====== Replace the existing object with task
+        array[i] = task;
+    // ====== Update tracker so that task array can be pushed
+        duplicateTracker = true;
+        break;
+      };
+    };
+    // ====== Push task object into array if tracker is true
+    if (!duplicateTracker) {
+      array.push(task);
+    };
+    // ====== Clears any empty strings from array
+    clearEmpty();
     // ====== Change array into string
     const arrayString = JSON.stringify(array);
     // ====== Send arrayString into local storage
     localStorage.setItem('task', arrayString);
   });
 
+  // ==================== CHANGE BACKGROUND FUNCTION ====================
+  $('div.row').each(function() {
+    // Grabs current hour
+    let currentHour = dayjs().hour();
+    //Grabs div id and changes to number to store in variable
+    let timeBlockId = parseInt($(this).attr('id'));
+    // Checks div id against current hour and sets background accordingly
+    if (currentHour === timeBlockId) {
+      $(this).removeClass('past future').addClass('present');
+    } else if (currentHour > timeBlockId) {
+      $(this).removeClass('present future').addClass('past');
+    } else if (currentHour < timeBlockId) {
+      $(this).removeClass('past present').addClass('future');
+    }
+  });
 
-  // ==================== CLICK FUNCTION ====================
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-
-
-
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  
-
-  // $('.description').text();
-
-  // for (let i=0; i<array.length; i++) {
-  //   console.log(array[i].timeBlock);
-  //   let timeBlockId = $(this).closest('.row').attr('id');
-  //   console.log(timeBlockId);
-  //   // if (array[i].timeBlock === ) {
-
-  //   // }
-  // }
-  // const divsToCheck = document.querySelectorAll('');
-
-  // Loop through each div and run a function on them
-  $('div').each(function() {
+  // ==================== FROM LOCAL STORAGE FUNCTION ====================
+  $('div.row').each(function() {
+    // ====== Grab the id from that div
     let divId = $(this).attr('id');
-
+    // ====== Loop through array and check if id of div matches the timeBlock of objects in array
     for (let i=0; i<array.length; i++) {
       if ( divId === array[i].timeBlock ) {
+    // ====== If match, add arrray timeBlock value to textfield on page
         $(this).closest('.row').find('.description').text(array[i].textfield);
+    // ====== Break from loop if matched
         break;
       };
     };
   });
 
-
-  // TODO: Add code to display the current date in the header of the page.
+  // ==================== HEADER DATE ====================
   $('#currentDay').text(dayjs().format('dddd - MMM DD, YYYY'));
+};
+
+// ==================== RUN FUNCTIONS ====================
+// When page is loaded, run updatePage function, and re-run function every hour
+$(function() {
+  updatePage();
+  setInterval(updatePage, 60*60*1000);
 });
