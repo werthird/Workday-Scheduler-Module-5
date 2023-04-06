@@ -1,0 +1,5 @@
+
+TO TRACK WHAT TIME OF DAY IT IS AND ADJUST THE BACKGROUND BASED ON THE TIME OF DAY
+
+grab current time of day and store in a variable
+
