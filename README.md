@@ -47,7 +47,7 @@ Here is a link to the loaded webpage, and a screen shot of the landing page.
 
 [Visit the page here](https://werthird.github.io/ucf-module-4-challenge/)
 
-![Code Quiz Landing Page Screenshot](/assets/images/code-quiz-screenshot.jpg "Code Quiz Landing Page Screenshot").
+![Code Quiz Landing Page Screenshot](/assets/images/work-day-scheduler-screenshot.jpg "Code Quiz Landing Page Screenshot").
 
 ----------------------
 ## Notes
