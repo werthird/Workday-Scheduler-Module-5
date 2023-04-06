@@ -24,12 +24,6 @@ function clearEmpty() {
 };
 
 
-
-
-
-  
-
-
 function updatePage() {
 
   // ==================== CLICK/TO LOCAL STORAGE FUNCTION ====================
